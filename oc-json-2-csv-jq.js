@@ -16,6 +16,7 @@ if (parsedCards && Array.isArray(parsedCards)) {
       type, //category
       power: card.power || '', //number (integer)
       toughness: card.toughness || '', //number (integer)
+      set: card.set || '', //category
       setType: card.set_type || '', //category
       reserved: card.reserved || 'False', //category
       edhrec_rank: card.edhrec_rank || '', //number (integer)
@@ -30,8 +31,6 @@ if (parsedCards && Array.isArray(parsedCards)) {
       //typeLine: card.type_line || '',
       //subType,
       //keywords: card.keywords && Array.isArray(card.keywords) ? card.keywords.join(',') : '',
-      //set: card.set || '',
-      //set_type: card.set_type || '',
       //border_color: card.border_color || '',
       //frame: card.frame || '',
       //full_art: card.full_art || 'False',
