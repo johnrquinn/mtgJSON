@@ -10,16 +10,25 @@ if (parsedCards && Array.isArray(parsedCards)) {
   let cardsList = parsedCards.map((card) => {
     const [ type = '', subType = '' ] = card.type_line ? card.type_line.split(' — ') : ['', ''];
         return {
-      name: card.name || '',
-      cmc: card.cmc || '',
+      name: card.name || '', //disable
+      cmc: card.cmc || '', //number (integer)
+      oracleText: card.oracle_text || '', //text
+      type, //category
+      power: card.power || '', //number (integer)
+      toughness: card.toughness || '', //number (integer)
+      setType: card.set_type || '', //category
+      reserved: card.reserved || 'False', //category
+      edhrec_rank: card.edhrec_rank || '', //number (integer)
+      rarity: card.rarity || '', //category
+      usd: card.prices.usd || '', //number
+      usdFoil: card.prices.usd_foil || '', //number
+      eur: card.prices.eur || '', //number
       //colors: card.colors || '', //!!Causes error on Akkio upload. How do we import arrays from the JSON?!!\\
+
+      //OTHER OPTIONS
       //manaCost: card.mana_cost || '',
-      oracleText: card.oracle_text || '',
       //typeLine: card.type_line || '',
-      type,
-      subType,
-      power: card.power || '',
-      toughness: card.toughness || '',
+      //subType,
       //keywords: card.keywords && Array.isArray(card.keywords) ? card.keywords.join(',') : '',
       //set: card.set || '',
       //set_type: card.set_type || '',
@@ -27,7 +36,6 @@ if (parsedCards && Array.isArray(parsedCards)) {
       //frame: card.frame || '',
       //full_art: card.full_art || 'False',
       //textless: card.textless || 'False',
-      reserved: card.reserved || 'False',
       //standard: card.legalities.standard || 'False',
       //modern: card.legalities.modern || 'False',
       //legacy: card.legalities.legacy || 'False',
@@ -35,11 +43,6 @@ if (parsedCards && Array.isArray(parsedCards)) {
       //commander: card.legalities.commander|| 'False',
       //pauper: card.legalities.pauper || 'False',
       //reprint: card.reprint || 'False',
-      edhrec_rank: card.edhrec_rank || '',
-      rarity: card.rarity || '',
-      usd: card.prices.usd || '',
-      usdFoil: card.prices.usd_foil || '',
-      eur: card.prices.eur || '',
     };
   });
 
