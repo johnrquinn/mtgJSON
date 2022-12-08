@@ -25,6 +25,8 @@ if (parsedCards && Array.isArray(parsedCards)) {
       usdFoil: card.prices.usd_foil || '', //number
       eur: card.prices.eur || '', //number
       //colors: card.colors || '', //!!Causes error on Akkio upload. How do we import arrays from the JSON?!!\\
+      // can turn an array into a string joining on a character like space or comma or both
+      // ['apple', 'banana', 'orange'].join(', ') === 'apple, banana, orange'
 
       //OTHER OPTIONS
       //manaCost: card.mana_cost || '',
