@@ -1,4 +1,5 @@
 const fs = require('fs');
+const _ = require('lodash');
 
 console.log('-- Reading File');
 const jsonFile = fs.readFileSync('oracle-cards.json');
