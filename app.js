@@ -1,5 +1,11 @@
+require('dotenv').config();
+
 const fs = require('fs');
 const _ = require('lodash');
+
+const utils = require('./utils');
+
+const dir = process.env.OUTPUT_DIR;
 
 console.log('-- Reading File');
 const jsonFile = fs.readFileSync('oracle-cards.json');
@@ -68,12 +74,8 @@ if (parsedCards && Array.isArray(parsedCards)) {
   const resultJson = JSON.stringify(cardsList);
 
   console.log('-- Writing JSON File');
-  const date = new Date();
-  const day = date.getDate();
-  const month = date.getMonth();
-  const hour = date.getHours();
-  const minute = date.getMinutes();
-  const fileDate = `${month}-${day}-${hour}:${minute}`;
+  if (!fs.existsSync(dir)) fs.mkdirSync(dir);
+  const fileDate = utils.getFileDate();
   fs.writeFile(`oracle-cards-${fileDate}.json`, resultJson, 'utf8', function(err) {
     if (err) {
       console.log('-- Error occured: file either not saved or corrupted file was saved.', err);
