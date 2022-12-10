@@ -36,7 +36,7 @@ if (parsedCards && Array.isArray(parsedCards)) {
       set: card.set ? card.set.toLowerCase() : '', //category
       setType: card.set_type ? card.set_type.toLowerCase() : '', //category
       reserved: card.reserved || 'False', //category
-      edhrec_rank: card.edhrec_rank || '', //number (integer)
+      edhrec_rank: card.edhrec_rank || '0', //number (integer)
       rarity: card.rarity ? card.rarity.toLowerCase() : '', //category
       usd: card.prices.usd || '', //number
 
