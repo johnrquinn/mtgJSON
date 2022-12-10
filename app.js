@@ -33,9 +33,10 @@ if (parsedCards && Array.isArray(parsedCards)) {
       type, //category
       power: card.power || '', //number (integer)
       toughness: card.toughness || '', //number (integer)
-      set: card.set ? card.set.toLowerCase() : '', //category
+      //set: card.set ? card.set.toLowerCase() : '', //category
       setType: card.set_type ? card.set_type.toLowerCase() : '', //category
       reserved: card.reserved || 'False', //category
+      released_at: card.released_at || '0', //date
       edhrec_rank: card.edhrec_rank || '0', //number (integer)
       rarity: card.rarity ? card.rarity.toLowerCase() : '', //category
       usd: card.prices.usd || '', //number
