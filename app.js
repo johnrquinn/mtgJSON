@@ -34,7 +34,7 @@ if (parsedCards && Array.isArray(parsedCards)) {
       power: card.power || '', //number (integer)
       toughness: card.toughness || '', //number (integer)
       //set: card.set ? card.set.toLowerCase() : '', //category
-      setType: card.set_type ? card.set_type.toLowerCase() : '', //category
+      setType: card.set_type ? card.set_type.toLowerCase() : '', //disabled
       reserved: card.reserved || 'False', //category
       released_at: card.released_at || '0', //date
       edhrec_rank: card.edhrec_rank || '0', //number (integer)
@@ -69,14 +69,14 @@ if (parsedCards && Array.isArray(parsedCards)) {
 // THE FILTER SECTION
   // const removeName = ['plains', 'island','swamp','mountain','forest'];
   const removeType = ['plane','scheme','vanguard','token','token creature','emblem','card // card','phenomenon','card','legendary enchantment — background','basic land']
-  const removeSetType = ['memorabilia', 'funny', 'token']
+  const removeSetType = ['memorabilia','funny','token']
   cardsList = cardsList.filter((card) => (
     //_.some(removeName, (name) => card.name !== name) ||
     _.some(removeType, (type) => card.type !== type) ||
     _.some(removeSetType, (setType) => card.setType !== setType)
   ));
 
-  const typeOutput = ['instant', 'sorcery','creature','planeswalker','land','enchantment'];
+  const typeOutput = ['instant','sorcery','creature','artifact creature','enchantment creature','legendary creature','planeswalker','land','enchantment','enchantment aura','artifact'];
   console.log('-- Generating JSON');
   const resultJson = JSON.stringify(cardsList);
 
