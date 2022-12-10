@@ -66,8 +66,8 @@ if (parsedCards && Array.isArray(parsedCards)) {
   });
 
 // THE FILTER SECTION
-  const removeName = ['plains', 'island','swamp','mountain','forest'];
-  const removeType = ['plane','scheme','vanguard','token','token creature','emblem','card // card','phenomenon','card','legendary enchantment — background']
+  // const removeName = ['plains', 'island','swamp','mountain','forest'];
+  const removeType = ['plane','scheme','vanguard','token','token creature','emblem','card // card','phenomenon','card','legendary enchantment — background','basic land']
   const removeSetType = ['memorabilia', 'funny', 'token']
   cardsList = cardsList.filter((card) => (
     _.some(removeName, (name) => card.name !== name) ||
