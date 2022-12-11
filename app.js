@@ -31,6 +31,7 @@ if (parsedCards && Array.isArray(parsedCards)) {
       cmc: card.cmc, //number (integer)
       oracleText: card.oracle_text ? card.oracle_text.toLowerCase().replace(regParens, '').replaceAll('\n', ' ') : '', //text
       type, //category
+      subType,
       power: card.power || '', //number (integer)
       toughness: card.toughness || '', //number (integer)
       set: card.set ? card.set.toLowerCase() : '', //category
@@ -49,7 +50,6 @@ if (parsedCards && Array.isArray(parsedCards)) {
 
       /* OTHER OPTIONS
       typeLine: card.type_line || '',
-      subType,
       manaCost: card.mana_cost || '',
       keywords: card.keywords && Array.isArray(card.keywords) ? card.keywords.join(',') : '',
       border_color: card.border_color || '',
@@ -74,9 +74,9 @@ if (parsedCards && Array.isArray(parsedCards)) {
     !_.some(removeType, (type) => card.type === type) && // remove bad set types
     !_.some(removeSetType, (setType) => card.setType === setType) // remove bad card types
   ));
-  cardsList = cardsList.filter((card) => (card.usd)); // remove cards with no value for usd
-  cardsList = cardsList.filter((card) => (card.usdFoil)); // remove cards with no value for usd
-  cardsList = cardsList.filter((card) => (card.eur)); // remove cards with no value for usd
+  //cardsList = cardsList.filter((card) => (card.usd)); // remove cards with no value for usd
+  //cardsList = cardsList.filter((card) => (card.usdFoil)); // remove cards with no value for usd
+  //cardsList = cardsList.filter((card) => (card.eur)); // remove cards with no value for usd
 
   // THE OUTPUT SECTION
   const instantSorcery = ['instant','sorcery']
@@ -88,6 +88,12 @@ if (parsedCards && Array.isArray(parsedCards)) {
 
   console.log('-- Generating JSON');
   const resultJson = JSON.stringify(cardsList);
+
+    /* JQ ATTEMPT HERE
+    const instantSorceryJson = cardsList.filter((card) => (
+    _.some(instantSorcery, (type) => card.type === type)
+  )); */
+
 
   console.log('-- Writing JSON File');
   if (!fs.existsSync(dir)) fs.mkdirSync(dir);
