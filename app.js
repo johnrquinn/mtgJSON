@@ -31,7 +31,6 @@ if (parsedCards && Array.isArray(parsedCards)) {
       cmc: card.cmc, //number (integer)
       oracleText: card.oracle_text ? card.oracle_text.toLowerCase().replace(regParens, '').replaceAll('\n', ' ') : '', //text
       type, //category
-      subType,
       power: card.power || '', //number (integer)
       toughness: card.toughness || '', //number (integer)
       set: card.set ? card.set.toLowerCase() : '', //category
@@ -50,6 +49,7 @@ if (parsedCards && Array.isArray(parsedCards)) {
 
       /* OTHER OPTIONS
       typeLine: card.type_line || '',
+      subType,
       manaCost: card.mana_cost || '',
       keywords: card.keywords && Array.isArray(card.keywords) ? card.keywords.join(',') : '',
       border_color: card.border_color || '',
