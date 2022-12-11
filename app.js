@@ -40,17 +40,17 @@ if (parsedCards && Array.isArray(parsedCards)) {
       edhrec_rank: card.edhrec_rank, //number (integer)
       rarity: card.rarity ? card.rarity.toLowerCase() : '', //category
       usd: card.prices.usd || '', //number
+      usdFoil: card.prices.usd_foil || '', //number
+      eur: card.prices.eur || '', //number
 
       //colors: card.colors || '', //!!Causes error on Akkio upload. How do we import arrays from the JSON?!!\\
       // can turn an array into a string joining on a character like space or comma or both
       // ['apple', 'banana', 'orange'].join(', ') === 'apple, banana, orange'
 
       /* OTHER OPTIONS
-      usdFoil: card.prices.usd_foil || '', //number
-      eur: card.prices.eur || '', //number
-      manaCost: card.mana_cost || '',
       typeLine: card.type_line || '',
       subType,
+      manaCost: card.mana_cost || '',
       keywords: card.keywords && Array.isArray(card.keywords) ? card.keywords.join(',') : '',
       border_color: card.border_color || '',
       frame: card.frame || '',
@@ -75,9 +75,17 @@ if (parsedCards && Array.isArray(parsedCards)) {
     !_.some(removeSetType, (setType) => card.setType === setType) // remove bad card types
   ));
   cardsList = cardsList.filter((card) => (card.usd)); // remove cards with no value for usd
+  cardsList = cardsList.filter((card) => (card.usdFoil)); // remove cards with no value for usd
+  cardsList = cardsList.filter((card) => (card.eur)); // remove cards with no value for usd
 
   // THE OUTPUT SECTION
-  const typeOutput = ['instant','sorcery','creature','artifact creature','enchantment creature','legendary creature','planeswalker','land','enchantment','enchantment aura','artifact'];
+  const instantSorcery = ['instant','sorcery']
+  const creatures = ['creature','artifact creature','enchantment creature','legendary creature']
+  const planeswalkers = ['planeswalker']
+  const lands = ['land']
+  const enchantments = ['enchantment','enchantment aura']
+  const artifacts = ['artifact']
+
   console.log('-- Generating JSON');
   const resultJson = JSON.stringify(cardsList);
 
