@@ -33,11 +33,11 @@ if (parsedCards && Array.isArray(parsedCards)) {
       type, //category
       power: card.power || '', //number (integer)
       toughness: card.toughness || '', //number (integer)
-      //set: card.set ? card.set.toLowerCase() : '', //category
+      set: card.set ? card.set.toLowerCase() : '', //category
       setType: card.set_type ? card.set_type.toLowerCase() : '', //disabled
       reserved: card.reserved || 'False', //category
       released_at: card.released_at || '0', //date
-      edhrec_rank: card.edhrec_rank || '0', //number (integer)
+      edhrec_rank: card.edhrec_rank, //number (integer)
       rarity: card.rarity ? card.rarity.toLowerCase() : '', //category
       usd: card.prices.usd || '', //number
 
@@ -54,6 +54,7 @@ if (parsedCards && Array.isArray(parsedCards)) {
       keywords: card.keywords && Array.isArray(card.keywords) ? card.keywords.join(',') : '',
       border_color: card.border_color || '',
       frame: card.frame || '',
+      penny_rank: card.penny_rank, //number (integer)
       full_art: card.full_art || 'False',
       textless: card.textless || 'False',
       standard: card.legalities.standard || 'False',
@@ -66,16 +67,16 @@ if (parsedCards && Array.isArray(parsedCards)) {
     };
   });
 
-// THE FILTER SECTION
-  // const removeName = ['plains', 'island','swamp','mountain','forest'];
-  const removeType = ['plane','scheme','vanguard','token','token creature','emblem','card // card','phenomenon','card','legendary enchantment — background','basic land']
+  // THE FILTER SECTION
+  const removeType = ['plane','scheme','vanguard','token','token creature','emblem','card // card','phenomenon','card','legendary enchantment — background','basic land','token artifact creature','token legendary creature']
   const removeSetType = ['memorabilia','funny','token']
   cardsList = cardsList.filter((card) => (
-    //_.some(removeName, (name) => card.name !== name) ||
-    _.some(removeType, (type) => card.type !== type) ||
-    _.some(removeSetType, (setType) => card.setType !== setType)
+    !_.some(removeType, (type) => card.type === type) && // remove bad set types
+    !_.some(removeSetType, (setType) => card.setType === setType) // remove bad card types
   ));
+  cardsList = cardsList.filter((card) => (card.usd)); // remove cards with no value for usd
 
+  // THE OUTPUT SECTION
   const typeOutput = ['instant','sorcery','creature','artifact creature','enchantment creature','legendary creature','planeswalker','land','enchantment','enchantment aura','artifact'];
   console.log('-- Generating JSON');
   const resultJson = JSON.stringify(cardsList);
