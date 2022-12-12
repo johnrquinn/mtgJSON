@@ -29,7 +29,7 @@ if (parsedCards && Array.isArray(parsedCards)) {
     return {
       name: card.name ? card.name.toLowerCase() : '', //disable
       cmc: card.cmc, //number (integer)
-      oracleText: card.oracle_text ? card.oracle_text.toLowerCase().replace(regParens, '').replaceAll('\n', ' ') : '', //text
+      oracleText: card.oracle_text ? card.oracle_text.toLowerCase().replace(regParens, '').replace(card.name.toLowerCase(), '').replaceAll('\n', ' ') : '', //text
       type, //category
       power: card.power || '', //number (integer)
       toughness: card.toughness || '', //number (integer)
@@ -55,14 +55,14 @@ if (parsedCards && Array.isArray(parsedCards)) {
       border_color: card.border_color || '',
       frame: card.frame || '',
       penny_rank: card.penny_rank, //number (integer)
-      full_art: card.full_art || 'False',
-      textless: card.textless || 'False',
       standard: card.legalities.standard || 'False',
       modern: card.legalities.modern || 'False',
       legacy: card.legalities.legacy || 'False',
       vintage: card.legalities.vintage || 'False',
       commander: card.legalities.commander|| 'False',
       pauper: card.legalities.pauper || 'False',
+      full_art: card.full_art || 'False',
+      textless: card.textless || 'False',
       reprint: card.reprint || 'False', */
     };
   });
@@ -74,9 +74,9 @@ if (parsedCards && Array.isArray(parsedCards)) {
     !_.some(removeType, (type) => card.type === type) && // remove bad set types
     !_.some(removeSetType, (setType) => card.setType === setType) // remove bad card types
   ));
-  //cardsList = cardsList.filter((card) => (card.usd)); // remove cards with no value for usd
-  //cardsList = cardsList.filter((card) => (card.usdFoil)); // remove cards with no value for usd
-  //cardsList = cardsList.filter((card) => (card.eur)); // remove cards with no value for usd
+  cardsList = cardsList.filter((card) => (card.usd)); // remove cards with no value for usd
+  cardsList = cardsList.filter((card) => (card.usdFoil)); // remove cards with no value for usdFoil
+  cardsList = cardsList.filter((card) => (card.eur)); // remove cards with no value for eur
 
   // THE OUTPUT SECTION
   const instantSorcery = ['instant','sorcery']
