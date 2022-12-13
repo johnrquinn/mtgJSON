@@ -1,9 +1,12 @@
-require('dotenv').config();
+import * as dotenv from 'dotenv';
+dotenv.config();
 
-const fs = require('fs');
-const _ = require('lodash');
+import * as fs from 'fs';
+import * as _ from 'lodash';
 
-const utils = require('./utils');
+import * as constants from './constants';
+import * as utils from './utils';
+import * as dgScraper from './dg-scraper.js';
 
 const dir = process.env.OUTPUT_DIR;
 
@@ -13,10 +16,10 @@ const jsonFile = fs.readFileSync('oracle-cards.json');
 console.log('-- Parsing JSON');
 const parsedCards = JSON.parse(jsonFile);
 
-if (parsedCards && Array.isArray(parsedCards)) {
+if (_.isArray(parsedCards)) {
   const regParens = new RegExp(/\(([^\)]+)\)/g);
-  let cardsList = parsedCards.map((card) => {
-    let typeLine = card.type_line.toLowerCase();
+  let cardsList = _.map(parsedCards, (card) => {
+    let typeLine = _.lowerCase(card.type_line);
     let types = [];
     if (_.includes(typeLine, ' - ')) {
       types = (types && typeLine.split(' - ')) || ['', ''];
@@ -24,24 +27,29 @@ if (parsedCards && Array.isArray(parsedCards)) {
       types = (types && typeLine.split(' — ')) || ['', ''];
     }
     let [ type, subType ] = types;
-    if (_.includes(subType, 'aura')) type = `${type} ${subType}`;
 
+    if (_.includes(subType, 'aura') || _.includes(subType, 'creature')) {
+      type = `${type} ${subType}`;
+      subType = '';
+    }
+
+    const name = _.lowerCase(card.name);
     return {
-      name: card.name ? card.name.toLowerCase() : '', //disable
+      name, //disable
       cmc: card.cmc, //number (integer)
-      oracleText: card.oracle_text ? card.oracle_text.toLowerCase().replace(regParens, '').replace(card.name.toLowerCase(), '').replaceAll('\n', ' ') : '', //text
+      oracleText: _.lowerCase(card.oracle_text).replace(regParens, '').replace(name, '').replaceAll('\n', ' '), //text
       type, //category
-      power: card.power || '', //number (integer)
-      toughness: card.toughness || '', //number (integer)
-      set: card.set ? card.set.toLowerCase() : '', //category
-      setType: card.set_type ? card.set_type.toLowerCase() : '', //disabled
-      reserved: card.reserved || 'False', //category
-      released_at: card.released_at || '0', //date
+      power: _.get(card, 'power', ''), //number (integer)
+      toughness: _.get(card, 'toughness', ''), //number (integer)
+      set: _.lowerCase(card.set), //category
+      setType: _.lowerCase(card.set_type), //disabled
+      reserved: _.get(card, 'reserved', 'False'), //category
+      released_at: _.get(card, 'released_at', '0'), //date
       edhrec_rank: card.edhrec_rank, //number (integer)
-      rarity: card.rarity ? card.rarity.toLowerCase() : '', //category
-      usd: card.prices.usd || '', //number
-      usdFoil: card.prices.usd_foil || '', //number
-      eur: card.prices.eur || '', //number
+      rarity: _.lowerCase(card.rarity), //category
+      usd: _.get(card, 'prices.usd', ''), //number
+      usdFoil: _.get(card, 'prices.usd_foil', ''), //number
+      eur: _.get(card, 'prices.eur', ''), //number
 
       //colors: card.colors || '', //!!Causes error on Akkio upload. How do we import arrays from the JSON?!!\\
       // can turn an array into a string joining on a character like space or comma or both
@@ -67,42 +75,57 @@ if (parsedCards && Array.isArray(parsedCards)) {
     };
   });
 
+  if (_.isArray(dgData)) {
+    _.forEach(dgData, ({ name, dgUsd }) => {
+      const match = _.find(cardsList, { name });
+      match.dgUsd = dgUsd;
+    });
+  }
+
   // THE FILTER SECTION
-  const removeType = ['plane','scheme','vanguard','token','token creature','emblem','card // card','phenomenon','card','legendary enchantment — background','basic land','token artifact creature','token legendary creature']
-  const removeSetType = ['memorabilia','funny','token']
-  cardsList = cardsList.filter((card) => (
-    !_.some(removeType, (type) => card.type === type) && // remove bad set types
-    !_.some(removeSetType, (setType) => card.setType === setType) // remove bad card types
+  cardsList = _.filter(cardsList, (card) => (
+    !_.some(typesToRemove, (type) => card.type === type) && // remove bad set types
+    !_.some(setsToRemove, (setType) => card.setType === setType) && // remove bad card types
+    _.some([card.usd, card.usdFoil, card.eur]) // remove cards with no monetary values
   ));
-  cardsList = cardsList.filter((card) => (card.usd)); // remove cards with no value for usd
-  cardsList = cardsList.filter((card) => (card.usdFoil)); // remove cards with no value for usdFoil
-  cardsList = cardsList.filter((card) => (card.eur)); // remove cards with no value for eur
 
   // THE OUTPUT SECTION
-  const instantSorcery = ['instant','sorcery']
-  const creatures = ['creature','artifact creature','enchantment creature','legendary creature']
-  const planeswalkers = ['planeswalker']
-  const lands = ['land']
-  const enchantments = ['enchantment','enchantment aura']
-  const artifacts = ['artifact']
+  // const instantSorcery = ['instant', 'sorcery'];
+  // const creatures = ['creature', 'artifact creature', 'enchantment creature', 'legendary creature'];
+  // const planeswalkers = ['planeswalker'];
+  // const lands = ['land'];
+  // const enchantments = ['enchantment', 'enchantment aura'];
+  // const artifacts = ['artifact'];
 
-  console.log('-- Generating JSON');
-  const resultJson = JSON.stringify(cardsList);
-
-    /* JQ ATTEMPT HERE
-    const instantSorceryJson = cardsList.filter((card) => (
+  /* JQ ATTEMPT HERE
+  const instantSorceryJson = cardsList.filter((card) => (
     _.some(instantSorcery, (type) => card.type === type)
-  )); */
-
-
+    )); */
+    
   console.log('-- Writing JSON File');
   if (!fs.existsSync(dir)) fs.mkdirSync(dir);
-  const fileDate = utils.getFileDate();
-  fs.writeFile(`${dir}/oracle-cards-${fileDate}.json`, resultJson, 'utf8', function(err) {
+  const fileDate = getFileDate();
+
+  _.forEach(outputSections, (sectionTypes) => {
+    const filteredTypes = _.filter(cardsList, (card) => _.some(sectionTypes, (type) => card.type));
+    const resultJson = JSON.stringify(filteredTypes);
+    const fileName = `${dir}/${sectionTypes.join('_')}_${fileDate}.json`;
+    fs.writeFile(fileName, resultJson, 'utf8', function(err) {
+      if (err) {
+        console.log(`-- Error occured: file either not saved or corrupted file was saved. ${fileName}`, err);
+      } else {
+        console.log(`-- Saved: ${fileName}`);
+      }
+    });
+  });
+
+  const fileName = `${dir}/all_${fileDate}.json`;
+  const resultJson = JSON.stringify(cardsList);
+  fs.writeFile(fileName, resultJson, 'utf8', function(err) {
     if (err) {
-      console.log('-- Error occured: file either not saved or corrupted file was saved.', err);
+      console.log(`-- Error occured: file either not saved or corrupted file was saved. ${fileName}`, err);
     } else {
-      console.log(`-- Saved: ${dir}/oracle-cards-${fileDate}.json`);
+      console.log(`-- Saved: ${fileName}`);
     }
   });
 } else {
