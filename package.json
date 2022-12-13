@@ -2,13 +2,13 @@
   "name": "mtgjson",
   "version": "1.0.0",
   "description": "",
-  "main": "app.js",
+  "main": "app/index.js",
   "scripts": {
-    "start": "npm run clear && node app.js",
-    "scrape-dg": "node dg-scraper.js",
+    "start": "npm run clear && node app/index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "clear": "rm -rf ./output"
   },
+  "type": "module",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/johnrquinn/mtgJSON.git"

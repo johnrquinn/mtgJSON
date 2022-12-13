@@ -1,4 +1,4 @@
-const _ = require('lodash');
+import _ from 'lodash';
 
 const getFileDate = function() {
   const date = new Date();
@@ -10,4 +10,4 @@ const getFileDate = function() {
   return fileDate;
 };
 
-module.exports = { getFileDate };
+export { getFileDate };
