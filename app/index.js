@@ -7,6 +7,7 @@ import _ from 'lodash';
 import { typesToRemove, setsToRemove, outputSections } from './constants.js';
 import { getFileDate } from './utils.js';
 import { scrapeDg } from './dg-scraper.js';
+import { getMtgCollection } from './mtgCollection.js';
 
 async function runApp() {
   const dir = process.env.OUTPUT_DIR;
@@ -56,6 +57,7 @@ async function runApp() {
         usdFoil: _.get(card, 'prices.usd_foil', ''), //number
         eur: _.get(card, 'prices.eur', ''), //number
         dgUsd: '',
+        mtgUsd: '',
 
         //colors: card.colors || '', //!!Causes error on Akkio upload. How do we import arrays from the JSON?!!\\
         // can turn an array into a string joining on a character like space or comma or both
@@ -80,7 +82,7 @@ async function runApp() {
         reprint: card.reprint || 'False', */
       };
     });
-    let matchCount = 0;
+    let dgMatchCount = 0;
     console.log('-- Scraping DG');
     const dgData = await scrapeDg();
     if (_.isArray(dgData)) {
@@ -88,11 +90,26 @@ async function runApp() {
         const match = _.find(cardsList, { name });
         if (match) {
           match.dgUsd = dgUsd;
-          matchCount++;
+          dgMatchCount++;
         }
       });
     }
-    console.log(`-- Number of DG matches: ${matchCount}`);
+    console.log(`-- Number of DG matches: ${dgMatchCount}`);
+
+    let mtgMatchCount = 0;
+    console.log('-- Converting MTG-Col from csv to json');
+    const mtgCollection = await getMtgCollection();
+    if (_.isArray(mtgCollection)) {
+      _.forEach(mtgCollection, ({ name, mtgUsd }) => {
+        const match = _.find(cardsList, { name });
+        if (match) {
+          match.mtgUsd = mtgUsd;
+          mtgMatchCount++;
+        }
+      });
+    }
+
+    console.log(`-- Number of MTG-Col matches: ${mtgMatchCount}`);
 
     // THE FILTER SECTION
     cardsList = _.filter(cardsList, (card) => (
