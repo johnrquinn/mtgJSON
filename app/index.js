@@ -40,10 +40,10 @@ async function runApp() {
       }
 
       const name = card.name.toLowerCase();
-      const oracleText = card.oracle_text.toLowerCase()
-                                        .replace(regParens, '')
-                                        .replace(name, '')
-                                        .replaceAll('\n', ' ');
+      const oracleText = _.toLower(card.oracle_text)
+                          .replace(regParens, '')
+                          .replace(name, '')
+                          .replaceAll('\n', ' ');
       return {
         name, //disable
         cmc: card.cmc, //number (integer)
