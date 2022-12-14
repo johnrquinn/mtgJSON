@@ -39,11 +39,15 @@ async function runApp() {
         subType = '';
       }
 
-      const name = _.lowerCase(card.name);
+      const name = card.name.toLowerCase();
+      const oracleText = card.oracle_text.toLowerCase()
+                                        .replace(regParens, '')
+                                        .replace(name, '')
+                                        .replaceAll('\n', ' ');
       return {
         name, //disable
         cmc: card.cmc, //number (integer)
-        oracleText: _.lowerCase(card.oracle_text).replace(regParens, '').replace(name, '').replaceAll('\n', ' '), //text
+        oracleText, //text
         type, //category
         power: _.get(card, 'power', ''), //number (integer)
         toughness: _.get(card, 'toughness', ''), //number (integer)
