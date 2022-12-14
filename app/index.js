@@ -21,19 +21,18 @@ async function runApp() {
     const regParens = new RegExp(/\(([^\)]+)\)/g);
     let cardsList = _.map(parsedCards, (card) => {
       let typeLine = _.lowerCase(card.type_line);
-      let types = [];
-      if (_.includes(typeLine, 'creature ')) {
-        typeLine = _.replace(typeLine, 'creature ', 'creature - ');
-      }
+      let types = [typeLine];
       if (_.includes(typeLine, ' - ')) {
-        types = (types && typeLine.split(' - ')) || ['', ''];
+        types = typeLine.split(' - ');
       } else if (_.includes(typeLine, ' — ')) {
-        types = (types && typeLine.split(' — ')) || ['', ''];
+        types = typeLine.split(' — ');
+      } else if (_.includes(typeLine, 'creature ')) {
+        types = typeLine.replace('creature ', 'creature!!!').split('!!!');
+      } else if (_.includes(typeLine, 'planeswalker ')) {
+        types = typeLine.replace('planeswalker ', 'planeswalker!!!').split('!!!');
       }
-      let [ type, subType ] = types;
-      if (_.some(outputSections.creature, (creatureType) => creatureType === type)) {
+      let [ type = '', subType = ''] = types;
 
-      }
       if (_.includes(subType, 'aura')) {
         type = `${type} ${subType}`;
         subType = '';
