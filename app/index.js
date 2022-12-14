@@ -21,7 +21,7 @@ async function runApp() {
   if (_.isArray(parsedCards)) {
     const regParens = new RegExp(/\(([^\)]+)\)/g);
     let cardsList = _.map(parsedCards, (card) => {
-      let typeLine = _.lowerCase(card.type_line);
+      let typeLine = _.toLower(card.type_line);
       let types = [typeLine];
       if (_.includes(typeLine, ' - ')) {
         types = typeLine.split(' - ');
@@ -51,12 +51,12 @@ async function runApp() {
         type, //category
         power: _.get(card, 'power', ''), //number (integer)
         toughness: _.get(card, 'toughness', ''), //number (integer)
-        set: _.lowerCase(card.set), //category
-        setType: _.lowerCase(card.set_type), //disabled
+        set: _.toLower(card.set), //category
+        setType: _.toLower(card.set_type), //disabled
         reserved: _.get(card, 'reserved', 'False'), //category
         released_at: _.get(card, 'released_at', '0'), //date
         edhrec_rank: card.edhrec_rank, //number (integer)
-        rarity: _.lowerCase(card.rarity), //category
+        rarity: _.toLower(card.rarity), //category
         usd: _.get(card, 'prices.usd', ''), //number
         usdFoil: _.get(card, 'prices.usd_foil', ''), //number
         eur: _.get(card, 'prices.eur', ''), //number

@@ -15,7 +15,7 @@ const urls = [
 
 function transformPage(data) {
   const $ = cheerio.load(data);
-  const namesList = $('.cN a').map((i, el) => $(el).text()).toArray().map((text) => _.lowerCase(text));
+  const namesList = $('.cN a').map((i, el) => $(el).text()).toArray().map((text) => _.toLower(text));
   const pricesList = $('.cP').map((i, el) => $(el).text()).toArray().map((text) => _.replace(text, '$', ''));
 
   if (namesList.length !== pricesList.length) console.log(`Error: lists of names and prices do not match up from ${url}`);
