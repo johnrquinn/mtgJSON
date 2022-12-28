@@ -2,9 +2,11 @@
   "name": "mtgjson",
   "version": "1.0.0",
   "description": "",
+  "scrape":"app/setScraper.js",
   "main": "app/index.js",
   "scripts": {
     "start": "npm run clear && node app/index.js",
+    "scrape": "npm run clear && node app/setScraper.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "clear": "rm -rf ./output"
   },

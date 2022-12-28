@@ -19,6 +19,9 @@ const setsToRemove = [
   'funny',
   'token',
 ];
+const setToScrape = [
+  'one'
+]
 const outputSections = [
   [
     'creature',
@@ -42,5 +45,6 @@ const outputSections = [
 export {
   typesToRemove,
   setsToRemove,
+  setToScrape,
   outputSections,
 };
