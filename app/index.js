@@ -51,8 +51,6 @@ async function runApp() {
         type, //category
         power: _.get(card, 'power', ''), //number (integer)
         toughness: _.get(card, 'toughness', ''), //number (integer)
-        set: _.toLower(card.set), //category
-        setType: _.toLower(card.set_type), //disabled
         reserved: _.get(card, 'reserved', 'False'), //category
         released_at: _.get(card, 'released_at', '0'), //date
         edhrec_rank: card.edhrec_rank, //number (integer)
@@ -68,6 +66,8 @@ async function runApp() {
         // ['apple', 'banana', 'orange'].join(', ') === 'apple, banana, orange'
 
         /* OTHER OPTIONS
+        set: _.toLower(card.set), //category
+        setType: _.toLower(card.set_type), //disabled
         typeLine: card.type_line || '',
         subType,
         manaCost: card.mana_cost || '',
