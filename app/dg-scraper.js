@@ -11,6 +11,7 @@ const urls = [
   process.env.DG_MODERN,
   process.env.DG_PIONEER,
   process.env.DG_LEGACY,
+  process.env.DG_OTHER,
 ];
 
 function transformPage(data) {

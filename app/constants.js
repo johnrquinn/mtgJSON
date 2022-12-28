@@ -33,10 +33,8 @@ const outputSections = [
     'enchantment',
     'enchantment aura',
   ],
-  [
-    'sorcery',
-    'instant',
-  ],
+  ['sorcery'],
+  ['instant'],
   ['artifact'],
   ['land'],
   ['planeswalker'],
