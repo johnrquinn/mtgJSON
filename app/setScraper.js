@@ -119,8 +119,8 @@ async function runApp() {
     cardsList = _.filter(cardsList, (card) => (
       !_.some(typesToRemove, (type) => card.type === type) && // remove bad set types
       !_.some(setsToRemove, (setType) => card.setType === setType) && // remove bad card types
-      _.some(setToScrape, (set) => card.set === set) && // remove sets that aren't the set we're testing for
-      _.some([card.usd, card.usdFoil, card.eur, card.dgUsd]) // remove cards with no monetary values
+      _.some(setToScrape, (set) => card.set === set) // remove sets that aren't the set we're testing for
+      //_.some([card.usd, card.usdFoil, card.eur, card.dgUsd]) // for this purpose, we don't want to remove cards with no dollar values!
     ));
 
     if (!fs.existsSync(dir)) fs.mkdirSync(dir);
