@@ -122,11 +122,6 @@ async function runApp() {
       _.some([card.usd, card.usdFoil, card.eur, card.dgUsd]) // remove cards with no monetary values
     ));
 
-    /* JQ ATTEMPT HERE
-    const instantSorceryJson = cardsList.filter((card) => (
-      _.some(instantSorcery, (type) => card.type === type)
-      )); */
-
     if (!fs.existsSync(dir)) fs.mkdirSync(dir);
     const fileDate = getFileDate();
 
