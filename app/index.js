@@ -9,6 +9,8 @@ import { getFileDate } from './utils.js';
 import { scrapeDg } from './dg-scraper.js';
 import { getMtgCollection } from './mtgCollection.js';
 
+const sampleSize = null; // Null will output all rows, otherwise all categories will be circumcized to length
+
 async function runApp() {
   const dir = process.env.OUTPUT_DIR;
 
@@ -40,34 +42,40 @@ async function runApp() {
       }
 
       const name = card.name.toLowerCase();
-      const oracleText = _.toLower(card.oracle_text)
+      // stopWords is a list of words that are not useful for searching
+      const stopWords = 'card this that it its a an the of and or then else for to in on at from with by as is are was were be been being have has had do does did can could should would will may might must'.split(' ');
+      let oracleText = _.toLower(card.oracle_text)
                           .replace(regParens, '')
-                          .replace(name, '')
+                          .replaceAll(name, '')
                           .replaceAll('\n', ' ');
+
+      _.forEach(stopWords, (word)=> {
+        oracleText = oracleText.replaceAll(` ${word} `, ' ');
+      });
+      // if (card.name === 'Blah') {
+      //   console.log(JSON.stringify(card));
+      // }
       return {
-        name, //disable
+        name, //disabled
+        setType: _.toLower(card.set_type), //disabled
         cmc: card.cmc, //number (integer)
+        colors: card.colors?.join?.(' ') || '', //category
         oracleText, //text
         type, //category
         power: _.get(card, 'power', ''), //number (integer)
         toughness: _.get(card, 'toughness', ''), //number (integer)
         reserved: _.get(card, 'reserved', 'False'), //category
-        released_at: _.get(card, 'released_at', '0'), //date
+        yearReleased: _.get(card, 'released_at', '0000').match(/\d{4}/)[0], //integer
         edhrec_rank: card.edhrec_rank, //number (integer)
         rarity: _.toLower(card.rarity), //category
+        set: _.toLower(card.set), //category
         usd: _.get(card, 'prices.usd', ''), //number
         usdFoil: _.get(card, 'prices.usd_foil', ''), //number
         eur: _.get(card, 'prices.eur', ''), //number
-        dgUsd: '',
-        mtgUsd: '',
-
-        //colors: card.colors || '', //!!Causes error on Akkio upload. How do we import arrays from the JSON?!!\\
-        // can turn an array into a string joining on a character like space or comma or both
-        // ['apple', 'banana', 'orange'].join(', ') === 'apple, banana, orange'
+        dgUsd: '', //number
+        mtgUsd: '', //number
 
         /* OTHER OPTIONS
-        set: _.toLower(card.set), //category
-        setType: _.toLower(card.set_type), //disabled
         typeLine: card.type_line || '',
         subType,
         manaCost: card.mana_cost || '',
@@ -86,10 +94,24 @@ async function runApp() {
         reprint: card.reprint || 'False', */
       };
     });
+
+    // THE SCRAPE SECTION
     let dgMatchCount = 0;
+    const fileDate = getFileDate();
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir);
     console.log('-- Scraping DG');
     const dgData = await scrapeDg();
     if (_.isArray(dgData)) {
+      const fileName = `${dir}/dg_${fileDate}.json`;
+      const resultJson = JSON.stringify(dgData);
+      fs.writeFile(fileName, resultJson, 'utf8', function(err) {
+        if (err) {
+          console.log(`-- Error occured: file either not saved or corrupted file was saved. ${fileName}`, err);
+        } else {
+          console.log(`-- Saved: ${fileName}`);
+        }
+      });
+
       _.forEach(dgData, ({ name, dgUsd }) => {
         const match = _.find(cardsList, { name });
         if (match) {
@@ -119,14 +141,16 @@ async function runApp() {
     cardsList = _.filter(cardsList, (card) => (
       !_.some(typesToRemove, (type) => card.type === type) && // remove bad set types
       !_.some(setsToRemove, (setType) => card.setType === setType) && // remove bad card types
-      _.some([card.usd, card.usdFoil, card.eur, card.dgUsd]) // remove cards with no monetary values
+      // _.some([card.usd, card.dgUsd]) && // remove cards with null usd/dgUsd value
+      _.some([card.usd, card.dgUsd, card.usdFoil, card.eur, card.mtgUsd]) // remove cards with no monetary values
     ));
 
-    if (!fs.existsSync(dir)) fs.mkdirSync(dir);
-    const fileDate = getFileDate();
-
     _.forEach(outputSections, (sectionTypes) => {
-      const filteredTypes = _.filter(cardsList, (card) => _.some(sectionTypes, (type) => _.includes(card.type, type)));
+      let filteredTypes = _.filter(cardsList, (card) => _.some(sectionTypes, (type) => _.isEqual(card.type, type)));
+      if (sampleSize) {
+        console.log(`-- ${sectionTypes[0]} is circumcized to `, sampleSize);
+        filteredTypes = _.sampleSize(filteredTypes, sampleSize);
+      }
       const resultJson = JSON.stringify(filteredTypes);
       const fileName = `${dir}/${sectionTypes[0].replace(' ', '_')}_${fileDate}.json`;
       fs.writeFile(fileName, resultJson, 'utf8', function(err) {
@@ -139,6 +163,10 @@ async function runApp() {
     });
 
     const fileName = `${dir}/all_${fileDate}.json`;
+    if (sampleSize) {
+      console.log('-- All is circumcized to ', sampleSize);
+      cardsList = _.sampleSize(cardsList, sampleSize);
+    }
     const resultJson = JSON.stringify(cardsList);
     fs.writeFile(fileName, resultJson, 'utf8', function(err) {
       if (err) {
