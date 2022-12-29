@@ -9,8 +9,6 @@ import { getFileDate } from './utils.js';
 import { scrapeDg } from './dg-scraper.js';
 import { getMtgCollection } from './mtgCollection.js';
 
-const sampleSize = null; // Null will output all rows, otherwise all categories will be circumcized to length
-
 async function runApp() {
   const dir = process.env.OUTPUT_DIR;
 
@@ -52,9 +50,12 @@ async function runApp() {
       _.forEach(stopWords, (word)=> {
         oracleText = oracleText.replaceAll(` ${word} `, ' ');
       });
-      // if (card.name === 'Blah') {
-      //   console.log(JSON.stringify(card));
-      // }
+
+      /* CODE TO TEST AN INDIVIDUAL CARD
+      if (card.name === 'Blah') {
+        console.log(JSON.stringify(card));
+      } */
+
       return {
         name, //disabled
         setType: _.toLower(card.set_type), //disabled
@@ -68,7 +69,6 @@ async function runApp() {
         yearReleased: _.get(card, 'released_at', '0000').match(/\d{4}/)[0], //integer
         edhrec_rank: card.edhrec_rank, //number (integer)
         rarity: _.toLower(card.rarity), //category
-        set: _.toLower(card.set), //category
         usd: _.get(card, 'prices.usd', ''), //number
         usdFoil: _.get(card, 'prices.usd_foil', ''), //number
         eur: _.get(card, 'prices.eur', ''), //number
@@ -76,6 +76,7 @@ async function runApp() {
         mtgUsd: '', //number
 
         /* OTHER OPTIONS
+        set: _.toLower(card.set), //category
         typeLine: card.type_line || '',
         subType,
         manaCost: card.mana_cost || '',
@@ -101,7 +102,8 @@ async function runApp() {
     if (!fs.existsSync(dir)) fs.mkdirSync(dir);
     console.log('-- Scraping DG');
     const dgData = await scrapeDg();
-    if (_.isArray(dgData)) {
+
+    if (_.isArray(dgData)) { /* UNCOMMENTING THIS PORTION WILL PRINT OUTPUT OF dgData
       const fileName = `${dir}/dg_${fileDate}.json`;
       const resultJson = JSON.stringify(dgData);
       fs.writeFile(fileName, resultJson, 'utf8', function(err) {
@@ -110,7 +112,7 @@ async function runApp() {
         } else {
           console.log(`-- Saved: ${fileName}`);
         }
-      });
+      }); */
 
       _.forEach(dgData, ({ name, dgUsd }) => {
         const match = _.find(cardsList, { name });
@@ -146,11 +148,7 @@ async function runApp() {
     ));
 
     _.forEach(outputSections, (sectionTypes) => {
-      let filteredTypes = _.filter(cardsList, (card) => _.some(sectionTypes, (type) => _.isEqual(card.type, type)));
-      if (sampleSize) {
-        console.log(`-- ${sectionTypes[0]} is circumcized to `, sampleSize);
-        filteredTypes = _.sampleSize(filteredTypes, sampleSize);
-      }
+      const filteredTypes = _.filter(cardsList, (card) => _.some(sectionTypes, (type) => _.isEqual(card.type, type)));
       const resultJson = JSON.stringify(filteredTypes);
       const fileName = `${dir}/${sectionTypes[0].replace(' ', '_')}_${fileDate}.json`;
       fs.writeFile(fileName, resultJson, 'utf8', function(err) {
@@ -163,10 +161,6 @@ async function runApp() {
     });
 
     const fileName = `${dir}/all_${fileDate}.json`;
-    if (sampleSize) {
-      console.log('-- All is circumcized to ', sampleSize);
-      cardsList = _.sampleSize(cardsList, sampleSize);
-    }
     const resultJson = JSON.stringify(cardsList);
     fs.writeFile(fileName, resultJson, 'utf8', function(err) {
       if (err) {
