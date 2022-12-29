@@ -41,10 +41,10 @@ async function runApp() {
 
       const name = card.name.toLowerCase();
       // stopWords is a list of words that are not useful for searching
-      const stopWords = 'card this that it its a an the of and or then else for to in on at from with by as is are was were be been being have has had do does did can could should would will may might must'.split(' ');
+      const stopWords = 'card this that it its a an the of and or then else for to in on at from with by as are was were be been being have has had do does did can could should would will may might must'.split(' ');
       let oracleText = _.toLower(card.oracle_text)
                           .replace(regParens, '')
-                          .replaceAll(name, '')
+                          .replaceAll(name, 'CARDNAME')
                           .replaceAll('\n', ' ');
 
       _.forEach(stopWords, (word)=> {
