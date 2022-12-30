@@ -58,6 +58,7 @@ async function runApp() {
 
       return {
         name, //disabled
+        set: _.toLower(card.set), //disabled
         setType: _.toLower(card.set_type), //disabled
         cmc: card.cmc, //number (integer)
         colors: card.colors?.join?.(' ') || '', //category
@@ -72,7 +73,8 @@ async function runApp() {
         usd: _.get(card, 'prices.usd', ''), //number
         usdFoil: _.get(card, 'prices.usd_foil', ''), //number
         eur: _.get(card, 'prices.eur', ''), //number
-        dgUsd: '', //number
+        tix: _.get(card, 'prices.tix', ''), //number
+        //dgUsd: '', //number
         mtgUsd: '', //number
 
         /* OTHER OPTIONS
@@ -97,9 +99,10 @@ async function runApp() {
     });
 
     // THE SCRAPE SECTION
-    let dgMatchCount = 0;
     const fileDate = getFileDate();
     if (!fs.existsSync(dir)) fs.mkdirSync(dir);
+
+    let dgMatchCount = 0;
     console.log('-- Scraping DG');
     const dgData = await scrapeDg();
 

@@ -40,28 +40,37 @@ async function runApp() {
       }
 
       const name = card.name.toLowerCase();
-      const oracleText = _.toLower(card.oracle_text)
+      // stopWords is a list of words that are not useful for searching
+      const stopWords = 'card this that it its a an the of and or then else for to in on at from with by as are was were be been being have has had do does did can could should would will may might must'.split(' ');
+      let oracleText = _.toLower(card.oracle_text)
                           .replace(regParens, '')
-                          .replace(name, '')
+                          .replaceAll(name, 'CARDNAME')
                           .replaceAll('\n', ' ');
+
+      _.forEach(stopWords, (word)=> {
+        oracleText = oracleText.replaceAll(` ${word} `, ' ');
+      });
+
       return {
-        name, //disable
+        name, //disabled
+        set: _.toLower(card.set), //disabled
+        setType: _.toLower(card.set_type), //disabled
         cmc: card.cmc, //number (integer)
+        colors: card.colors?.join?.(' ') || '', //category
         oracleText, //text
         type, //category
         power: _.get(card, 'power', ''), //number (integer)
         toughness: _.get(card, 'toughness', ''), //number (integer)
-        set: _.toLower(card.set), //category
-        setType: _.toLower(card.set_type), //disabled
         reserved: _.get(card, 'reserved', 'False'), //category
-        released_at: _.get(card, 'released_at', '0'), //date
+        yearReleased: _.get(card, 'released_at', '0000').match(/\d{4}/)[0], //integer
         edhrec_rank: card.edhrec_rank, //number (integer)
         rarity: _.toLower(card.rarity), //category
         usd: _.get(card, 'prices.usd', ''), //number
         usdFoil: _.get(card, 'prices.usd_foil', ''), //number
         eur: _.get(card, 'prices.eur', ''), //number
-        dgUsd: '',
-        mtgUsd: '',
+        tix: _.get(card, 'prices.tix', ''), //number
+        //dgUsd: '', //number
+        mtgUsd: '', //number
 
         //colors: card.colors || '', //!!Causes error on Akkio upload. How do we import arrays from the JSON?!!\\
         // can turn an array into a string joining on a character like space or comma or both
