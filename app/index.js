@@ -63,6 +63,7 @@ async function runApp() {
         cmc: card.cmc, //number (integer)
         colors: card.colors?.join?.(' ') || '', //category
         oracleText, //text
+        keywords: card.keywords && Array.isArray(card.keywords) ? card.keywords.join(',') : '',
         type, //category
         power: _.get(card, 'power', ''), //number (integer)
         toughness: _.get(card, 'toughness', ''), //number (integer)
@@ -82,7 +83,6 @@ async function runApp() {
         typeLine: card.type_line || '',
         subType,
         manaCost: card.mana_cost || '',
-        keywords: card.keywords && Array.isArray(card.keywords) ? card.keywords.join(',') : '',
         border_color: card.border_color || '',
         frame: card.frame || '',
         penny_rank: card.penny_rank, //number (integer)
