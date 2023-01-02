@@ -17,29 +17,11 @@ async function runApp() {
   const parsedCards = JSON.parse(jsonFile);
 
   if (_.isArray(parsedCards)) {
-    const regParens = new RegExp(/\(([^\)]+)\)/g);
-    let cardsList = _.map(parsedCards, (card) => {
-      let typeLine = _.toLower(card.type_line);
-      let types = [typeLine];
-      if (_.includes(typeLine, ' - ')) {
-        types = typeLine.split(' - ');
-      } else if (_.includes(typeLine, ' — ')) {
-        types = typeLine.split(' — ');
-      } else if (_.includes(typeLine, 'creature ')) {
-        types = typeLine.replace('creature ', 'creature!!!').split('!!!');
-      } else if (_.includes(typeLine, 'planeswalker ')) {
-        types = typeLine.replace('planeswalker ', 'planeswalker!!!').split('!!!');
-      }
-      let [ type = '', subType = ''] = types;
-
-      if (_.includes(subType, 'aura')) {
-        type = `${type} ${subType}`;
-        subType = '';
-      }
-
-      const name = card.name.toLowerCase();
-      // stopWords is a list of words that are not useful for searching
+      const regParens = new RegExp(/\(([^\)]+)\)/g);
       const stopWords = 'card this that it its a an the of and or then else for to in on at from with by as are was were be been being have has had do does did can could should would will may might must'.split(' ');
+
+      let cardsList = _.map(parsedCards, (card) => {
+      const name = card.name.toLowerCase();
       let oracleText = _.toLower(card.oracle_text)
                           .replace(regParens, '')
                           .replaceAll(name, 'cardname')
@@ -53,11 +35,12 @@ async function runApp() {
         name, //disabled
         set: _.toLower(card.set), //disabled
         setType: _.toLower(card.set_type), //disabled
+        manaCost: card.mana_cost || '',
         cmc: card.cmc, //number (integer)
         colors: card.colors?.join?.(' ') || '', //category
         oracleText, //text
-        keywords: card.keywords && Array.isArray(card.keywords) ? card.keywords.join(',') : '',
-        type, //category
+        keywords: Array.isArray(card.keywords) ? card.keywords.join(',') : 'None',
+        typeLine: _.toLower(card.type_line), //category
         power: _.get(card, 'power', ''), //number (integer)
         toughness: _.get(card, 'toughness', ''), //number (integer)
         reserved: _.get(card, 'reserved', 'False'), //category
@@ -71,7 +54,6 @@ async function runApp() {
         set: _.toLower(card.set), //category
         typeLine: card.type_line || '',
         subType,
-        manaCost: card.mana_cost || '',
         border_color: card.border_color || '',
         frame: card.frame || '',
         penny_rank: card.penny_rank, //number (integer)
@@ -85,7 +67,7 @@ async function runApp() {
         textless: card.textless || 'False',
         reprint: card.reprint || 'False', */
       };
-    });
+      });
 
     // THE FILTER SECTION
     cardsList = _.filter(cardsList, (card) => (
