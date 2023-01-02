@@ -18,7 +18,6 @@ const setsToRemove = [
   'memorabilia',
   'funny',
   'token',
-  //'masters' if we're using oracle cards we cant filter out masters because it may be the only version of a card
 ];
 const setToScrape = [
   'one'

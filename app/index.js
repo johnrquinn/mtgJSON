@@ -6,8 +6,6 @@ import _ from 'lodash';
 
 import { typesToRemove, setsToRemove, outputSections } from './constants.js';
 import { getFileDate } from './utils.js';
-import { scrapeDg } from './dg-scraper.js';
-import { getMtgCollection } from './mtgCollection.js';
 
 async function runApp() {
   const dir = process.env.OUTPUT_DIR;
@@ -44,17 +42,12 @@ async function runApp() {
       const stopWords = 'card this that it its a an the of and or then else for to in on at from with by as are was were be been being have has had do does did can could should would will may might must'.split(' ');
       let oracleText = _.toLower(card.oracle_text)
                           .replace(regParens, '')
-                          .replaceAll(name, 'CARDNAME')
+                          .replaceAll(name, 'cardname')
                           .replaceAll('\n', ' ');
 
       _.forEach(stopWords, (word)=> {
         oracleText = oracleText.replaceAll(` ${word} `, ' ');
       });
-
-      /* CODE TO TEST AN INDIVIDUAL CARD
-      if (card.name === 'Blah') {
-        console.log(JSON.stringify(card));
-      } */
 
       return {
         name, //disabled
@@ -72,11 +65,7 @@ async function runApp() {
         edhrec_rank: card.edhrec_rank, //number (integer)
         rarity: _.toLower(card.rarity), //category
         usd: _.get(card, 'prices.usd', ''), //number
-        usdFoil: _.get(card, 'prices.usd_foil', ''), //number
         eur: _.get(card, 'prices.eur', ''), //number
-        tix: _.get(card, 'prices.tix', ''), //number
-        //dgUsd: '', //number
-        mtgUsd: '', //number
 
         /* OTHER OPTIONS
         set: _.toLower(card.set), //category
@@ -98,50 +87,6 @@ async function runApp() {
       };
     });
 
-    // THE SCRAPE SECTION
-    const fileDate = getFileDate();
-    if (!fs.existsSync(dir)) fs.mkdirSync(dir);
-
-    let dgMatchCount = 0;
-    console.log('-- Scraping DG');
-    const dgData = await scrapeDg();
-
-    if (_.isArray(dgData)) { /* UNCOMMENTING THIS PORTION WILL PRINT OUTPUT OF dgData
-      const fileName = `${dir}/dg_${fileDate}.json`;
-      const resultJson = JSON.stringify(dgData);
-      fs.writeFile(fileName, resultJson, 'utf8', function(err) {
-        if (err) {
-          console.log(`-- Error occured: file either not saved or corrupted file was saved. ${fileName}`, err);
-        } else {
-          console.log(`-- Saved: ${fileName}`);
-        }
-      }); */
-
-      _.forEach(dgData, ({ name, dgUsd }) => {
-        const match = _.find(cardsList, { name });
-        if (match) {
-          match.dgUsd = dgUsd;
-          dgMatchCount++;
-        }
-      });
-    }
-    console.log(`-- Number of DG matches: ${dgMatchCount}`);
-
-    let mtgMatchCount = 0;
-    console.log('-- Converting MTG-Col from csv to json');
-    const mtgCollection = await getMtgCollection();
-    if (_.isArray(mtgCollection)) {
-      _.forEach(mtgCollection, ({ name, mtgUsd }) => {
-        const match = _.find(cardsList, { name });
-        if (match) {
-          match.mtgUsd = mtgUsd;
-          mtgMatchCount++;
-        }
-      });
-    }
-
-    console.log(`-- Number of MTG-Col matches: ${mtgMatchCount}`);
-
     // THE FILTER SECTION
     cardsList = _.filter(cardsList, (card) => (
       !_.some(typesToRemove, (type) => card.type === type) && // remove bad set types
@@ -149,6 +94,9 @@ async function runApp() {
       // _.some([card.usd, card.dgUsd]) && // remove cards with null usd/dgUsd value
       _.some([card.usd, card.dgUsd, card.usdFoil, card.eur, card.mtgUsd]) // remove cards with no monetary values
     ));
+
+    const fileDate = getFileDate();
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir);
 
     _.forEach(outputSections, (sectionTypes) => {
       const filteredTypes = _.filter(cardsList, (card) => _.some(sectionTypes, (type) => _.isEqual(card.type, type)));
