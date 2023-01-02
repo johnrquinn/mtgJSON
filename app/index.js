@@ -18,7 +18,7 @@ async function runApp() {
 
   if (_.isArray(parsedCards)) {
       const regParens = new RegExp(/\(([^\)]+)\)/g);
-      const stopWords = 'card this that it its a an the of and or then else for to in on at from with by as are was were be been being have has had do does did can could should would will may might must'.split(' ');
+      const stopWords = '. , card this that it its a an the of and or then else for to in on at from with by as are was were be been being have has had do does did can could should would will may might must'.split(' ');
 
       let cardsList = _.map(parsedCards, (card) => {
       const name = card.name.toLowerCase();
@@ -36,14 +36,14 @@ async function runApp() {
         set: _.toLower(card.set), //disabled
         setType: _.toLower(card.set_type), //disabled
         manaCost: card.mana_cost || '',
+        loyalty: card.loyalty || 'None',
         cmc: card.cmc, //number (integer)
-        colors: card.colors?.join?.(' ') || '', //category
+        colors: card.colors?.join?.(' ') || 'None', //category
         oracleText, //text
-        keywords: Array.isArray(card.keywords) ? card.keywords.join(',') : 'None',
+        keywords: Array.isArray(card.keywords) && card.keywords.length > 0 ? card.keywords.join(',') : 'None',
         typeLine: _.toLower(card.type_line), //category
-        power: _.get(card, 'power', ''), //number (integer)
-        toughness: _.get(card, 'toughness', ''), //number (integer)
-        reserved: _.get(card, 'reserved', 'False'), //category
+        power: _.get(card, 'power', 'None'), //number (integer)
+        toughness: _.get(card, 'toughness', 'None',), //number (integer)
         yearReleased: _.get(card, 'released_at', '0000').match(/\d{4}/)[0], //integer
         edhrec_rank: card.edhrec_rank, //number (integer)
         rarity: _.toLower(card.rarity), //category
@@ -51,9 +51,7 @@ async function runApp() {
         eur: _.get(card, 'prices.eur', ''), //number
 
         /* OTHER OPTIONS
-        set: _.toLower(card.set), //category
-        typeLine: card.type_line || '',
-        subType,
+        reserved: _.get(card, 'reserved', 'False'), //category
         border_color: card.border_color || '',
         frame: card.frame || '',
         penny_rank: card.penny_rank, //number (integer)
@@ -71,10 +69,10 @@ async function runApp() {
 
     // THE FILTER SECTION
     cardsList = _.filter(cardsList, (card) => (
-      !_.some(typesToRemove, (type) => card.type === type) && // remove bad set types
+      !_.some(typesToRemove, (type) => card.typeLine === type) && // remove bad set types
       !_.some(setsToRemove, (setType) => card.setType === setType) && // remove bad card types
-      // _.some([card.usd, card.dgUsd]) && // remove cards with null usd/dgUsd value
-      _.some([card.usd, card.dgUsd, card.usdFoil, card.eur, card.mtgUsd]) // remove cards with no monetary values
+      _.some([card.usd, card.usdFoil, card.eur]) // remove cards with no monetary values
+      // card.yearReleased >= 2004 // attempting to filter only newer cards but it doesn't seem to help?
     ));
 
     const fileDate = getFileDate();

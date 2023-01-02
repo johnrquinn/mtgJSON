@@ -13,6 +13,8 @@ const typesToRemove = [
   'basic land',
   'token artifact creature',
   'token legendary creature',
+  'land', // testing All Cards without any lands
+  'legendary land',
 ];
 const setsToRemove = [
   'memorabilia',
