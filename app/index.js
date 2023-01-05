@@ -35,23 +35,23 @@ async function runApp() {
         name, //disabled
         set: _.toLower(card.set), //disabled
         setType: _.toLower(card.set_type), //disabled
-        manaCost: card.mana_cost || '',
-        loyalty: card.loyalty || 'None',
+        manaCost: card.mana_cost || '', //text
         cmc: card.cmc, //number (integer)
-        colors: card.colors?.join?.(' ') || 'None', //category
+        colors: card.colors?.join?.(' ') || 'Colorless', //category
         oracleText, //text
-        keywords: Array.isArray(card.keywords) && card.keywords.length > 0 ? card.keywords.join(',') : 'None',
-        typeLine: _.toLower(card.type_line), //category
+        loyalty: card.loyalty || 'None', //number (integer)
+        keywords: Array.isArray(card.keywords) && card.keywords.length > 0 ? card.keywords.join(',') : 'None', //text
+        typeLine: _.toLower(card.type_line), //text
         power: _.get(card, 'power', 'None'), //number (integer)
         toughness: _.get(card, 'toughness', 'None',), //number (integer)
-        yearReleased: _.get(card, 'released_at', '0000').match(/\d{4}/)[0], //integer
-        edhrec_rank: card.edhrec_rank, //number (integer)
+        yearReleased: _.get(card, 'released_at', '0000').match(/\d{4}/)[0], //number (integer)
         rarity: _.toLower(card.rarity), //category
         usd: _.get(card, 'prices.usd', ''), //number
         eur: _.get(card, 'prices.eur', ''), //number
 
         /* OTHER OPTIONS
         reserved: _.get(card, 'reserved', 'False'), //category
+        edhrec_rank: card.edhrec_rank, //number (integer)
         border_color: card.border_color || '',
         frame: card.frame || '',
         penny_rank: card.penny_rank, //number (integer)
