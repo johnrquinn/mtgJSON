@@ -11,6 +11,7 @@ const typesToRemove = [
   'card',
   'legendary enchantment — background',
   'basic land',
+  'basic snow land',
   'token artifact creature',
   'token legendary creature',
   'land', // testing All Cards without any lands
@@ -39,7 +40,7 @@ const outputSections = [
   ['instant'],
   ['artifact'],
   ['land'],
-  ['planeswalker'],
+  ['legendary planeswalker'],
 ];
 
 export {
